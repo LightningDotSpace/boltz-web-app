@@ -6,7 +6,7 @@ const config = {
     network: "regtest",
     loglevel: "debug",
     apiUrl: {
-        normal: "http://localhost:9001",
+        normal: "http://localhost:3001/v1/atomic-swap",
     },
     assets: {
         BTC: {
