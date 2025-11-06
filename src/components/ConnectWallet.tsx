@@ -220,16 +220,27 @@ export const ConnectAddress = (props: {
     );
 };
 
-export const SwitchNetwork = () => {
+export const SwitchNetwork = (props?: { asset?: string }) => {
     const { t, notify } = useGlobalContext();
     const { switchNetwork } = useWeb3Signer();
+
+    // Try to get asset from CreateContext if available
+    let targetAsset = props?.asset;
+    try {
+        const createContext = useCreateContext();
+        if (!targetAsset && createContext) {
+            targetAsset = createContext.assetReceive();
+        }
+    } catch {
+        // CreateContext not available in this component tree
+    }
 
     return (
         <button
             class="btn"
             onClick={async () => {
                 try {
-                    await switchNetwork();
+                    await switchNetwork(targetAsset);
                 } catch (e) {
                     log.error(`Network switch failed: ${formatError(e)}`);
                     notify("error", `Network switch failed: ${formatError(e)}`);
@@ -246,18 +257,21 @@ const ConnectWallet = (props: {
     addressOverride?: Accessor<string | undefined>;
 }) => {
     const { t } = useGlobalContext();
-    const { providers, signer, getContracts } = useWeb3Signer();
-    const { setAddressValid, setOnchainAddress } = useCreateContext();
+    const { providers, signer, getContractsForAsset } = useWeb3Signer();
+    const { setAddressValid, setOnchainAddress, assetReceive } = useCreateContext();
 
     const address = createMemo(() => signer()?.address);
     const [networkValid, setNetworkValid] = createSignal<boolean>(true);
 
     // eslint-disable-next-line solid/reactivity
     createEffect(async () => {
+        // Get contracts for the selected asset, not for the currently connected wallet
+        const contracts = getContractsForAsset(assetReceive());
         if (
             address() !== undefined &&
+            contracts &&
             Number((await signer()?.provider.getNetwork())?.chainId || -1) !==
-                getContracts().network.chainId
+                contracts.network.chainId
         ) {
             setNetworkValid(false);
             return;

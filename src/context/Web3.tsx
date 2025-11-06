@@ -15,7 +15,7 @@ import LedgerIcon from "../assets/ledger.svg";
 import TrezorIcon from "../assets/trezor.svg";
 import WalletConnectIcon from "../assets/wallet-connect.svg";
 import { config } from "../config";
-import { RBTC } from "../consts/Assets";
+import { RBTC, cBTC } from "../consts/Assets";
 import type { EIP1193Provider, EIP6963ProviderDetail } from "../consts/Types";
 import WalletConnectProvider from "../utils/WalletConnectProvider";
 import type { Contracts } from "../utils/boltzClient";
@@ -61,6 +61,30 @@ const customDerivationPathRdns: string[] = [
     HardwareRdns.Trezor,
 ];
 
+// Mapping: chainId -> contract key in API response
+const chainIdToContractKey = (chainId: number): string | undefined => {
+    switch (chainId) {
+        case 30:
+            return "rsk";
+        case 5115:
+            return "citrea";
+        default:
+            return undefined;
+    }
+};
+
+// Mapping: chainId -> asset symbol
+const chainIdToAsset = (chainId: number): string | undefined => {
+    switch (chainId) {
+        case 30:
+            return RBTC;
+        case 5115:
+            return cBTC;
+        default:
+            return undefined;
+    }
+};
+
 const Web3SignerContext = createContext<{
     providers: Accessor<Record<string, EIP6963ProviderDetail>>;
     hasBrowserWallet: Accessor<boolean>;
@@ -74,10 +98,12 @@ const Web3SignerContext = createContext<{
     signer: Accessor<Signer | undefined>;
     clearSigner: () => void;
 
-    switchNetwork: () => Promise<void>;
+    switchNetwork: (asset?: string) => Promise<void>;
 
-    getContracts: Resource<Contracts>;
-    getEtherSwap: () => EtherSwap;
+    allContracts: Resource<Record<string, Contracts> | undefined>;
+    getContracts: () => Contracts | undefined;
+    getContractsForAsset: (asset: string) => Contracts | undefined;
+    getEtherSwap: (asset?: string) => EtherSwap;
 
     openWalletConnectModal: Accessor<boolean>;
     setOpenWalletConnectModal: Setter<boolean>;
@@ -89,7 +115,8 @@ const Web3SignerProvider = (props: {
 }) => {
     const { setRdns, getRdnsForAddress, t } = useGlobalContext();
 
-    const hasRsk = config.assets[RBTC] !== undefined;
+    const hasEvmAssets =
+        config.assets[RBTC] !== undefined || config.assets[cBTC] !== undefined;
 
     const [providers, setProviders] = createSignal<
         Record<string, EIP6963ProviderDetail>
@@ -182,19 +209,104 @@ const Web3SignerProvider = (props: {
         window.dispatchEvent(new Event("eip6963:requestProvider"));
     });
 
-    const [contracts] = createResource(async () => {
-        if (props.noFetch || !hasRsk) {
+    const [allContracts] = createResource(async () => {
+        if (props.noFetch || !hasEvmAssets) {
             return undefined;
         }
 
-        return (await getContracts())["rsk"];
+        return await getContracts();
     });
 
-    const getEtherSwap = () => {
+    // Get contracts based on the currently connected signer's chainId, or default to RBTC
+    const getContractsForCurrentChain = (): Contracts | undefined => {
+        const contracts = allContracts();
+        if (!contracts) return undefined;
+
+        // Try to get chainId from signer
+        const currentSigner = signer();
+        if (currentSigner) {
+            try {
+                // This is async but we'll handle it synchronously by relying on cached network
+                const network = currentSigner.provider._network;
+                if (network) {
+                    const contractKey = chainIdToContractKey(Number(network.chainId));
+                    if (contractKey && contracts[contractKey]) {
+                        return contracts[contractKey];
+                    }
+                }
+            } catch (e) {
+                log.debug("Could not get network from provider in getContractsForCurrentChain", e);
+            }
+        }
+
+        // Default to RSK if available
+        return contracts["rsk"] || contracts["citrea"];
+    };
+
+    // Get contracts for a specific asset (RBTC or cBTC)
+    const getContractsForAsset = (asset: string): Contracts | undefined => {
+        const contracts = allContracts();
+        if (!contracts) return undefined;
+
+        // Map asset to contract key
+        let contractKey: string | undefined;
+        if (asset === RBTC) {
+            contractKey = "rsk";
+        } else if (asset === cBTC) {
+            contractKey = "citrea";
+        }
+
+        if (contractKey && contracts[contractKey]) {
+            return contracts[contractKey];
+        }
+
+        // Fallback
+        return contracts["rsk"] || contracts["citrea"];
+    };
+
+    const getEtherSwap = (asset?: string) => {
+        // Use asset-specific contracts if provided, otherwise use current chain
+        const contracts = asset
+            ? getContractsForAsset(asset)
+            : getContractsForCurrentChain();
+
+        if (!contracts) {
+            throw new Error("No contracts available");
+        }
+
+        // Determine which asset config to use for RPC
+        let rpcUrls: string[] | undefined;
+
+        // If asset is provided, use its RPC
+        if (asset && config.assets[asset]?.network?.rpcUrls) {
+            rpcUrls = config.assets[asset].network.rpcUrls;
+        } else {
+            // Try to get from current signer
+            const currentSigner = signer();
+            if (currentSigner) {
+                try {
+                    const network = currentSigner.provider._network;
+                    if (network) {
+                        const detectedAsset = chainIdToAsset(Number(network.chainId));
+                        if (detectedAsset && config.assets[detectedAsset]?.network?.rpcUrls) {
+                            rpcUrls = config.assets[detectedAsset].network.rpcUrls;
+                        }
+                    }
+                } catch (e) {
+                    log.debug("Could not get network from provider, using fallback", e);
+                }
+            }
+        }
+
+        // Fallback to RBTC RPC
+        if (!rpcUrls) {
+            rpcUrls = config.assets[RBTC]?.network?.rpcUrls;
+        }
+
         return new Contract(
-            contracts().swapContracts.EtherSwap,
+            contracts.swapContracts.EtherSwap,
             EtherSwapAbi,
-            signer() || createProvider(config.assets["RBTC"]?.network?.rpcUrls),
+            signer() || createProvider(rpcUrls),
         ) as unknown as EtherSwap;
     };
 
@@ -249,12 +361,39 @@ const Web3SignerProvider = (props: {
         setSigner(signer);
     };
 
-    const switchNetwork = async () => {
+    const switchNetwork = async (asset?: string) => {
         if (rawProvider() === undefined) {
             return;
         }
 
-        const sanitizedChainId = `0x${contracts().network.chainId.toString(16)}`;
+        const contracts = getContractsForCurrentChain();
+        if (!contracts) {
+            throw new Error("No contracts available");
+        }
+
+        // Determine which asset to use: provided param, or infer from current signer
+        let targetAsset = asset;
+        if (!targetAsset) {
+            const currentSigner = signer();
+            if (currentSigner) {
+                const network = currentSigner.provider._network;
+                if (network) {
+                    targetAsset = chainIdToAsset(Number(network.chainId));
+                }
+            }
+        }
+
+        // Fallback to RBTC
+        if (!targetAsset) {
+            targetAsset = RBTC;
+        }
+
+        const assetConfig = config.assets[targetAsset];
+        if (!assetConfig || !assetConfig.network) {
+            throw new Error(`No network config for asset ${targetAsset}`);
+        }
+
+        const sanitizedChainId = `0x${contracts.network.chainId.toString(16)}`;
 
         try {
             await rawProvider().request({
@@ -275,10 +414,8 @@ const Web3SignerProvider = (props: {
                     method: "wallet_addEthereumChain",
                     params: [
                         {
-                            ...config.assets[RBTC].network,
-                            blockExplorerUrls: [
-                                config.assets[RBTC].blockExplorerUrl.normal,
-                            ],
+                            ...assetConfig.network,
+                            blockExplorerUrls: [assetConfig.blockExplorerUrl.normal],
                             chainId: sanitizedChainId,
                         },
                     ],
@@ -301,7 +438,9 @@ const Web3SignerProvider = (props: {
                 openWalletConnectModal,
                 setOpenWalletConnectModal,
                 connectProviderForAddress,
-                getContracts: contracts,
+                allContracts,
+                getContracts: getContractsForCurrentChain,
+                getContractsForAsset,
                 clearSigner: () => {
                     log.info(`Clearing connected signer`);
                     if (rawProvider()) {

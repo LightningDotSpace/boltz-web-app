@@ -17,9 +17,10 @@ const ContractTransaction = (props: {
     promptText?: string;
     waitingText?: string;
     address: { address: string; derivationPath?: string };
+    asset?: string;
 }) => {
     const { notify } = useGlobalContext();
-    const { signer, getContracts } = useWeb3Signer();
+    const { signer, getContracts, getContractsForAsset } = useWeb3Signer();
     const [txSent, setTxSent] = createSignal(false);
     const [clicked, setClicked] = createSignal(false);
 
@@ -55,8 +56,13 @@ const ContractTransaction = (props: {
                 </Show>
             }>
             <Show
-                when={getContracts().network.chainId === signerNetwork()}
-                fallback={<SwitchNetwork />}>
+                when={
+                    (props.asset
+                        ? getContractsForAsset(props.asset)
+                        : getContracts()
+                    )?.network.chainId === signerNetwork()
+                }
+                fallback={<SwitchNetwork asset={props.asset} />}>
                 <Show
                     when={!txSent()}
                     fallback={

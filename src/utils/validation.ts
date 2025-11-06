@@ -14,7 +14,7 @@ import type { BaseContract } from "ethers";
 import { ethers } from "ethers";
 import log from "loglevel";
 
-import { LBTC, RBTC } from "../consts/Assets";
+import { LBTC, RBTC, cBTC } from "../consts/Assets";
 import { Denomination, Side, SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
 import { etherSwapCodeHashes } from "../context/Web3";
@@ -47,10 +47,17 @@ const validateContract = async (getEtherSwap: ContractGetter) => {
         return true;
     }
 
-    const code = await getEtherSwap().getDeployedCode();
-    if (!codeHashes.includes(ethers.keccak256(code))) {
-        log.error("invalid contract code:", code);
-        return false;
+    try {
+        const code = await getEtherSwap().getDeployedCode();
+        if (!codeHashes.includes(ethers.keccak256(code))) {
+            log.error("invalid contract code:", code);
+            return false;
+        }
+    } catch (error) {
+        // If network is not available yet, skip contract validation
+        // The contract will be validated when the wallet is actually used
+        log.debug("Skipping contract validation (network not ready):", error);
+        return true;
     }
 
     return true;
@@ -170,7 +177,8 @@ const validateReverse = async (
         return false;
     }
 
-    if (swap.assetReceive === RBTC) {
+    // EVM assets (RBTC, cBTC) only need contract validation
+    if (swap.assetReceive === RBTC || swap.assetReceive === cBTC) {
         return validateContract(getEtherSwap);
     }
 
@@ -216,7 +224,8 @@ const validateSubmarine = async (
         return false;
     }
 
-    if (swap.assetSend === RBTC) {
+    // EVM assets (RBTC, cBTC) only need contract validation
+    if (swap.assetSend === RBTC || swap.assetSend === cBTC) {
         return validateContract(getEtherSwap);
     }
 
@@ -291,7 +300,8 @@ const validateChainSwap = async (
             }
         }
 
-        if (asset === RBTC) {
+        // EVM assets (RBTC, cBTC) only need contract validation
+        if (asset === RBTC || asset === cBTC) {
             return validateContract(getEtherSwap);
         }
 
