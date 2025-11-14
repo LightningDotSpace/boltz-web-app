@@ -58,6 +58,7 @@ const RefundState = (props: {
                 claimAddress={props.refundData.claimAddress}
                 signerAddress={props.refundData.refundAddress}
                 timeoutBlockHeight={Number(props.refundData.timelock)}
+                asset={props.asset}
             />
             <hr />
             <BlockExplorer
@@ -81,7 +82,7 @@ const RefundEvm = () => {
         }
 
         const [logData, currentHeight] = await Promise.all([
-            getLogsFromReceipt(signer(), getEtherSwap(), params.txHash),
+            getLogsFromReceipt(signer(), getEtherSwap(params.asset), params.txHash),
             signer().provider.getBlockNumber(),
         ]);
 

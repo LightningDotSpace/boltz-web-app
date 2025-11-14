@@ -5,7 +5,7 @@ import type { LiquidClaimDetails } from "boltz-core/dist/lib/liquid";
 import type { Network as LiquidNetwork } from "liquidjs-lib/src/networks";
 import log from "loglevel";
 
-import { LBTC, RBTC } from "../consts/Assets";
+import { isEvmAsset, LBTC } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
 import type { RescueFile } from "../utils/rescueFile";
@@ -149,8 +149,8 @@ export const createTheirPartialChainSwapSignature = async (
     deriveKey: deriveKeyFn,
     swap: ChainSwap,
 ): Promise<Awaited<ReturnType<typeof postChainSwapDetails>> | undefined> => {
-    // RSK claim transactions can't be signed cooperatively
-    if (swap.assetSend === RBTC) {
+    // EVM claim transactions can't be signed cooperatively
+    if (isEvmAsset(swap.assetSend)) {
         return undefined;
     }
 
@@ -314,7 +314,7 @@ export const claim = async <T extends ReverseSwap | ChainSwap>(
     cooperative: boolean,
 ): Promise<T | undefined> => {
     const asset = getRelevantAssetForSwap(swap);
-    if (asset === RBTC) {
+    if (isEvmAsset(asset)) {
         return undefined;
     }
 
@@ -355,7 +355,7 @@ export const createSubmarineSignature = async (
     swap: SubmarineSwap,
 ) => {
     const swapAsset = getRelevantAssetForSwap(swap);
-    if (swapAsset === RBTC) {
+    if (isEvmAsset(swapAsset)) {
         return;
     }
 

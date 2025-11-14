@@ -46,6 +46,7 @@ import type { ChainSwap, SomeSwap, SubmarineSwap } from "../utils/swapCreator";
 import ErrorWasm from "./ErrorWasm";
 import { mapSwap } from "./RefundRescue";
 import { rescueListAction } from "./Rescue";
+import { RBTC } from "src/consts/Assets";
 
 export enum RefundError {
     InvalidData,
@@ -415,7 +416,7 @@ export const RefundRsk = () => {
         const generator = scanLogsForPossibleRefunds(
             refundScanAbort.signal,
             signer(),
-            getEtherSwap(),
+            getEtherSwap(RBTC),
         );
 
         for await (const value of generator) {

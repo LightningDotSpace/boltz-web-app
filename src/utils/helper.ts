@@ -2,7 +2,7 @@ import { Buffer } from "buffer";
 import type { ECPairInterface } from "ecpair";
 
 import { chooseUrl, config } from "../config";
-import { BTC, LN, RBTC } from "../consts/Assets";
+import { BTC, isEvmAsset, LN } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import { referralIdKey } from "../consts/LocalStorage";
 import type { deriveKeyFn } from "../context/Global";
@@ -186,7 +186,7 @@ export const getDestinationAddress = (swap: SomeSwap) => {
         return "";
     }
 
-    if (swap.assetReceive === RBTC) {
+    if (isEvmAsset(swap.assetReceive)) {
         return swap.signer;
     }
 

@@ -51,3 +51,12 @@
         content: "rootstock";
     }
 }
+
+.asset-cBTC {
+    .icon {
+        background-image: vars.$citrea_icon;
+    }
+    .asset-text:before {
+        content: "citrea";
+    }
+}

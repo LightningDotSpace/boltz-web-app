@@ -81,6 +81,22 @@ const config = {
                 deployVerifier: "0xc0F5bEF6b20Be41174F826684c663a8635c6A081",
             },
         },
+        cBTC: {
+            blockExplorerUrl: {
+                id: Explorer.Blockscout,
+                normal: "https://testnet.citreascan.com",
+            },
+            network: {
+                chainName: "Citrea Testnet",
+                chainId: 5115,
+                rpcUrls: ["https://rpc.testnet.citreascan.com"],
+                nativeCurrency: {
+                    name: "cBTC",
+                    symbol: "cBTC",
+                    decimals: 18,
+                },
+            },
+        },
     },
 } as Config;
 

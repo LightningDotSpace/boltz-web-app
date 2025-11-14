@@ -8,11 +8,11 @@ import { ECPair } from "../../src/utils/ecpair";
 import { validateResponse } from "../../src/utils/validation";
 
 describe("validate responses", () => {
-    const getEtherSwap = (code: string): (() => Contract) => {
+    const getEtherSwap = (code: string): ((asset: string) => Contract) => {
         const getDeployedCode = vi.fn().mockResolvedValue(code);
-        return vi.fn(() => ({
+        return vi.fn((_asset: string) => ({
             getDeployedCode,
-        })) as unknown as () => Contract;
+        })) as unknown as (asset: string) => Contract;
     };
 
     beforeAll(() => {

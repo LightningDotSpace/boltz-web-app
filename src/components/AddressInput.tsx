@@ -1,7 +1,7 @@
 import log from "loglevel";
 import { createEffect, on } from "solid-js";
 
-import { LN, RBTC } from "../consts/Assets";
+import { LN, isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import { useCreateContext } from "../context/Create";
 import { useGlobalContext } from "../context/Global";
@@ -88,7 +88,7 @@ const AddressInput = () => {
             if (
                 sendAmount().isGreaterThan(0) &&
                 swapType() !== SwapType.Submarine &&
-                assetReceive() !== RBTC &&
+                !isEvmAsset(assetReceive()) &&
                 onchainAddress() === ""
             ) {
                 setAddressValid(false);

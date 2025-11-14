@@ -35,6 +35,7 @@ const LockupEvm = (props: {
     signerAddress: string;
     derivationPath?: string;
     timeoutBlockHeight: number;
+    asset: string;
 }) => {
     const { setSwap } = usePayContext();
     const { getEtherSwap, signer, providers } = useWeb3Signer();
@@ -78,9 +79,10 @@ const LockupEvm = (props: {
                     when={signer() === undefined || signerBalance() > value()}
                     fallback={<InsufficientBalance />}>
                     <ContractTransaction
+                        asset={props.asset}
                         /* eslint-disable-next-line solid/reactivity */
                         onClick={async () => {
-                            const contract = getEtherSwap();
+                            const contract = getEtherSwap(props.asset);
                             const tx = await contract.lock(
                                 prefix0x(props.preimageHash),
                                 props.claimAddress,

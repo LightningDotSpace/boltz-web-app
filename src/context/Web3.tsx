@@ -15,7 +15,7 @@ import LedgerIcon from "../assets/ledger.svg";
 import TrezorIcon from "../assets/trezor.svg";
 import WalletConnectIcon from "../assets/wallet-connect.svg";
 import { config } from "../config";
-import { RBTC } from "../consts/Assets";
+import { assetToChainKey, evmAssets, isEvmAsset } from "../consts/Assets";
 import type { EIP1193Provider, EIP6963ProviderDetail } from "../consts/Types";
 import WalletConnectProvider from "../utils/WalletConnectProvider";
 import type { Contracts } from "../utils/boltzClient";
@@ -74,10 +74,11 @@ const Web3SignerContext = createContext<{
     signer: Accessor<Signer | undefined>;
     clearSigner: () => void;
 
-    switchNetwork: () => Promise<void>;
+    switchNetwork: (asset: string) => Promise<void>;
 
-    getContracts: Resource<Contracts>;
-    getEtherSwap: () => EtherSwap;
+    getContracts: Resource<Record<string, Contracts>>;
+    getContractsForAsset: (asset: string) => Contracts | undefined;
+    getEtherSwap: (asset: string) => EtherSwap;
 
     openWalletConnectModal: Accessor<boolean>;
     setOpenWalletConnectModal: Setter<boolean>;
@@ -92,7 +93,7 @@ const Web3SignerProvider = (props: {
 }) => {
     const { setRdns, getRdnsForAddress, t } = useGlobalContext();
 
-    const hasRsk = config.assets[RBTC] !== undefined;
+    const hasEvmAssets = evmAssets.some(asset => config.assets[asset] !== undefined);
 
     const [providers, setProviders] = createSignal<
         Record<string, EIP6963ProviderDetail>
@@ -187,11 +188,11 @@ const Web3SignerProvider = (props: {
     });
 
     const [contracts] = createResource(async () => {
-        if (props.noFetch || !hasRsk) {
+        if (props.noFetch || !hasEvmAssets) {
             return undefined;
         }
 
-        return (await getContracts())["rsk"];
+        return await getContracts();
     });
 
     const connectProviderForAddress = async (
@@ -213,12 +214,22 @@ const Web3SignerProvider = (props: {
         await connectProvider(rdns);
     };
 
-    const getEtherSwap = () => {
+    const getEtherSwap = (asset: string) => {
+        const assetContracts = getContractsForAsset(asset);
+        if (!assetContracts) {
+            throw new Error(`No contracts found for asset: ${asset}`);
+        }
+
         return new Contract(
-            contracts().swapContracts.EtherSwap,
+            assetContracts.swapContracts.EtherSwap,
             EtherSwapAbi,
-            signer() || createProvider(config.assets["RBTC"]?.network?.rpcUrls),
+            signer() || createProvider(config.assets[asset]?.network?.rpcUrls),
         ) as unknown as EtherSwap;
+    };
+
+    const getContractsForAsset = (asset: string): Contracts | undefined => {
+        const chainKey = assetToChainKey[asset];
+        return contracts()[chainKey];
     };
 
     const connectProvider = async (rdns: string) => {
@@ -253,12 +264,17 @@ const Web3SignerProvider = (props: {
         setSigner(signer);
     };
 
-    const switchNetwork = async () => {
+    const switchNetwork = async (asset: string) => {
         if (rawProvider() === undefined) {
             return;
         }
 
-        const sanitizedChainId = `0x${contracts().network.chainId.toString(16)}`;
+        const assetContracts = getContractsForAsset(asset);
+        if (!assetContracts) {
+            throw new Error(`No contracts found for asset: ${asset}`);
+        }
+
+        const sanitizedChainId = `0x${assetContracts.network.chainId.toString(16)}`;
 
         try {
             await rawProvider().request({
@@ -279,9 +295,9 @@ const Web3SignerProvider = (props: {
                     method: "wallet_addEthereumChain",
                     params: [
                         {
-                            ...config.assets[RBTC].network,
+                            ...config.assets[asset].network,
                             blockExplorerUrls: [
-                                config.assets[RBTC].blockExplorerUrl.normal,
+                                config.assets[asset].blockExplorerUrl.normal,
                             ],
                             chainId: sanitizedChainId,
                         },
@@ -299,6 +315,7 @@ const Web3SignerProvider = (props: {
                 signer,
                 providers,
                 getEtherSwap,
+                getContractsForAsset,
                 switchNetwork,
                 connectProvider,
                 hasBrowserWallet,

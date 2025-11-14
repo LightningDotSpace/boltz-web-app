@@ -5,7 +5,7 @@ import { Show, createEffect, createResource, createSignal } from "solid-js";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import { config } from "../config";
-import { RBTC } from "../consts/Assets";
+import { isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import { useGlobalContext } from "../context/Global";
 import { usePayContext } from "../context/Pay";
@@ -77,7 +77,7 @@ const TransactionClaimed = () => {
         // Else make sure the transaction was actually broadcast
         setClaimBroadcast(
             s.type !== SwapType.Reverse ||
-                s.assetReceive === RBTC ||
+                isEvmAsset(s.assetReceive) ||
                 s.claimTx !== undefined,
         );
     });
