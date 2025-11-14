@@ -8,7 +8,7 @@ if (rskFallback) {
     rskRpcUrls.push(rskFallback);
 }
 
-const lndApiUrl = import.meta.env.VITE_LND_API_URL;
+const boltzApiUrl = import.meta.env.VITE_BOLTZ_API_URL;
 
 const config = {
     ...baseConfig,
@@ -16,7 +16,7 @@ const config = {
     network: "mainnet",
     loglevel: "debug",
     apiUrl: {
-        normal: lndApiUrl,
+        normal: boltzApiUrl,
         tor: "http://boltzzzbnus4m7mta3cxmflnps4fp7dueu2tgurstbvrbt6xswzcocyd.onion/api",
     },
     assets: {
