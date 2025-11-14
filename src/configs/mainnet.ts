@@ -8,13 +8,15 @@ if (rskFallback) {
     rskRpcUrls.push(rskFallback);
 }
 
+const boltzApiUrl = import.meta.env.VITE_BOLTZ_API_URL;
+
 const config = {
     ...baseConfig,
     torUrl: "http://boltzzzbnus4m7mta3cxmflnps4fp7dueu2tgurstbvrbt6xswzcocyd.onion/",
     network: "mainnet",
     loglevel: "debug",
     apiUrl: {
-        normal: "https://api.boltz.exchange",
+        normal: boltzApiUrl,
         tor: "http://boltzzzbnus4m7mta3cxmflnps4fp7dueu2tgurstbvrbt6xswzcocyd.onion/api",
     },
     assets: {
