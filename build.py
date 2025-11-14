@@ -26,6 +26,10 @@ if network != "regtest":
             data = f.read()
 
             for var in [
+                "VITE_RSK_LOG_SCAN_ENDPOINT",
+                "VITE_RSK_FALLBACK_ENDPOINT",
+                "VITE_WALLETCONNECT_PROJECT_ID",
+                "VITE_CHATWOOT_TOKEN",
                 "VITE_BOLTZ_API_URL"
             ]:
                 if var not in data:
