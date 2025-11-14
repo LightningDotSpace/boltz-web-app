@@ -8,6 +8,9 @@ COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
 
+ARG NODE_ENVIRONMENT
+COPY ".env.${NODE_ENVIRONMENT}" .env 
+
 ARG NETWORK=mainnet
 
 RUN npm run $NETWORK
