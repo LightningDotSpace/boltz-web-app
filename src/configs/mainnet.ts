@@ -74,6 +74,7 @@ const config = {
                 },
             },
             rifRelay: "https://boltz.mainnet.relay.rifcomputing.net",
+            logScanRpcUrl: import.meta.env.VITE_RSK_LOG_SCAN_ENDPOINT,
             contracts: {
                 deployHeight: 6747215,
                 smartWalletFactory:
@@ -96,6 +97,7 @@ const config = {
                     decimals: 18,
                 },
             },
+            logScanRpcUrl: import.meta.env.VITE_CITREA_LOG_SCAN_ENDPOINT,
         },
     },
 } as Config;

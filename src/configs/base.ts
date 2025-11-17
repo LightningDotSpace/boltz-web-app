@@ -5,6 +5,7 @@ type Asset = {
     blockExplorerApis?: ExplorerUrl[];
 
     rifRelay?: string;
+    logScanRpcUrl?: string;
     contracts?: {
         deployHeight: number;
         smartWalletFactory?: string;
