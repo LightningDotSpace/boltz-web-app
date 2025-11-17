@@ -218,6 +218,7 @@ const dict = {
         insufficient_balance: "Insufficient balance",
         insufficient_balance_line:
             "You do not have enough balance in your wallet for this swap.",
+        insufficient_gas: "Insufficient balance for gas fees",
         select_wallet: "Select wallet",
         select_derivation_path: "Select derivation path",
         submit_derivation_path: "Submit",
@@ -682,6 +683,7 @@ const dict = {
         insufficient_balance: "Unzureichendes Guthaben",
         insufficient_balance_line:
             "Du hast nicht genügend Guthaben für diesen Swap.",
+        insufficient_gas: "Unzureichendes Guthaben für Gasgebühren",
         select_wallet: "Wallet auswählen",
         select_derivation_path: "Ableitungspfad auswählen",
         submit_derivation_path: "Senden",
@@ -1154,6 +1156,7 @@ const dict = {
         insufficient_balance: "Saldo insuficiente",
         insufficient_balance_line:
             "No tienes saldo suficiente en tu monedero para este swap.",
+        insufficient_gas: "Saldo insuficiente para tarifas de gas",
         select_wallet: "Seleccionar monedero",
         select_derivation_path: "Seleccionar ruta de derivación",
         submit_derivation_path: "Enviar",
@@ -1620,6 +1623,7 @@ const dict = {
         insufficient_balance: "Saldo insuficiente",
         insufficient_balance_line:
             "Não há saldo suficiente na sua carteira para essa troca.",
+        insufficient_gas: "Saldo insuficiente para taxas de gás",
         select_wallet: "Selecionar carteira",
         select_derivation_path: "Selecionar caminho de derivação",
         submit_derivation_path: "Enviar",
@@ -2058,6 +2062,7 @@ const dict = {
         error_starting_qr_scanner: "无法访问摄像头, 请检查权限！",
         insufficient_balance: "余额不足",
         insufficient_balance_line: "您的钱包余额不足以进行此次交换。",
+        insufficient_gas: "gas费余额不足",
         select_wallet: "选择钱包",
         select_derivation_path: "选择派生路径",
         submit_derivation_path: "提交",
@@ -2502,6 +2507,7 @@ const dict = {
         insufficient_balance: "残高不足",
         insufficient_balance_line:
             "このスワップを実行するのに十分な残高がウォレットにありません",
+        insufficient_gas: "ガス料金の残高不足",
         select_wallet: "ウォレットの選択",
         select_derivation_path: "導出パスの選択",
         submit_derivation_path: "提出",

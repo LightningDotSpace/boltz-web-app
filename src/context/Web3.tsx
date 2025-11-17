@@ -229,7 +229,8 @@ const Web3SignerProvider = (props: {
 
     const getContractsForAsset = (asset: string): Contracts | undefined => {
         const chainKey = assetToChainKey[asset];
-        return contracts()[chainKey];
+        const contractsData = contracts();
+        return contractsData?.[chainKey];
     };
 
     const connectProvider = async (rdns: string) => {

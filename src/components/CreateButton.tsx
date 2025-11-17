@@ -4,6 +4,7 @@ import log from "loglevel";
 import type { Accessor } from "solid-js";
 import { createEffect, createSignal, on, onMount } from "solid-js";
 
+import { config } from "../config";
 import { BTC, isEvmAsset } from "../consts/Assets";
 import { InvoiceValidation, SwapType } from "../consts/Enums";
 import type { ButtonLabelParams } from "../consts/Types";
@@ -68,18 +69,23 @@ export const getClaimAddress = async (
                 .provider.getFeeData()
                 .then((data) => data.gasPrice),
         ]);
-        log.debug("RSK balance", balance);
+        log.debug("EVM balance", balance);
 
         const balanceNeeded = gasPrice * GasNeededToClaim;
-        log.debug("RSK balance needed", balanceNeeded);
+        log.debug("EVM balance needed", balanceNeeded);
 
         if (balance <= balanceNeeded) {
-            log.info("Using RIF smart wallet as claim address");
-            return {
-                gasPrice,
-                useRif: true,
-                claimAddress: (await getSmartWalletAddress(signer())).address,
-            };
+            const assetConfig = config.assets[assetReceive()];
+            if (assetConfig?.rifRelay && assetConfig?.contracts?.smartWalletFactory) {
+                log.info("Using RIF smart wallet as claim address");
+                return {
+                    gasPrice,
+                    useRif: true,
+                    claimAddress: (await getSmartWalletAddress(signer())).address,
+                };
+            } else {
+                throw new Error("insufficient_gas");
+            }
         } else {
             log.info("RIF smart wallet not needed");
         }
@@ -627,7 +633,8 @@ const CreateButton = () => {
             await createSwap(claimAddress, useRif);
         } catch (e) {
             log.error("Error creating swap", e);
-            notify("error", e);
+            const errorMsg = formatError(e);
+            notify("error", t(errorMsg as DictKey) || errorMsg);
         } finally {
             setLoading(false);
         }
