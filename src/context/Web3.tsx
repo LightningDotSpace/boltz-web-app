@@ -15,7 +15,7 @@ import LedgerIcon from "../assets/ledger.svg";
 import TrezorIcon from "../assets/trezor.svg";
 import WalletConnectIcon from "../assets/wallet-connect.svg";
 import { config } from "../config";
-import { assetToChainKey, evmAssets, isEvmAsset } from "../consts/Assets";
+import { assetToChainKey, evmAssets } from "../consts/Assets";
 import type { EIP1193Provider, EIP6963ProviderDetail } from "../consts/Types";
 import WalletConnectProvider from "../utils/WalletConnectProvider";
 import type { Contracts } from "../utils/boltzClient";
@@ -343,29 +343,9 @@ const Web3SignerProvider = (props: {
 
 const useWeb3Signer = () => useContext(Web3SignerContext);
 
-const etherSwapCodeHashes = () => {
-    switch (config.network) {
-        case "mainnet":
-            return [
-                "0x4d6894da95269c76528b81c6d25425a2f6bba70156cfaf7725064f919647d955",
-                "0x8fda06a72295779e211ad2dc1bcf3f9904d23fa617f42fe0c5fc1e89b17c1777",
-            ];
-
-        case "testnet":
-            return [
-                "0xd9a282305f30590b3df70c3c1f9338b042a97dff12736794e9de2cdabf8542c1",
-                "0xb8f6205d7fecc5b7a577519c7ec40af594f929d150c05bf84e1f94b7472dd783",
-            ];
-
-        default:
-            return undefined;
-    }
-};
-
 export {
     EtherSwapAbi,
     useWeb3Signer,
     Web3SignerProvider,
-    etherSwapCodeHashes,
     customDerivationPathRdns,
 };

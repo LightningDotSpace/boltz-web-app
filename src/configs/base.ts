@@ -10,6 +10,7 @@ type Asset = {
         deployHeight: number;
         smartWalletFactory?: string;
         deployVerifier?: string;
+        swapCodeHashes?: string[];
     };
     network?: {
         chainName: string;

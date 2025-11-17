@@ -14,10 +14,10 @@ import type { BaseContract } from "ethers";
 import { ethers } from "ethers";
 import log from "loglevel";
 
+import { config } from "../config";
 import { isEvmAsset, LBTC } from "../consts/Assets";
 import { Denomination, Side, SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
-import { etherSwapCodeHashes } from "../context/Web3";
 import type { ChainSwapDetails } from "./boltzClient";
 import { decodeAddress } from "./compat";
 import { formatAmountDenomination } from "./denomination";
@@ -42,7 +42,7 @@ const invalidReceiveAmountMsg = (expected: number, got: number) =>
 type ContractGetter = (asset: string) => BaseContract;
 
 const validateContract = async (getEtherSwap: ContractGetter, asset: string) => {
-    const codeHashes = etherSwapCodeHashes();
+    const codeHashes = config.assets[asset]?.contracts?.swapCodeHashes;
     if (codeHashes === undefined) {
         return true;
     }

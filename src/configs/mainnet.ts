@@ -80,6 +80,10 @@ const config = {
                 smartWalletFactory:
                     "0x44944a80861120B58cc48B066d57cDAf5eC213dd",
                 deployVerifier: "0xc0F5bEF6b20Be41174F826684c663a8635c6A081",
+                swapCodeHashes: [
+                    "0x4d6894da95269c76528b81c6d25425a2f6bba70156cfaf7725064f919647d955",
+                    "0x8fda06a72295779e211ad2dc1bcf3f9904d23fa617f42fe0c5fc1e89b17c1777",
+                ],
             },
         },
         cBTC: {
@@ -98,6 +102,13 @@ const config = {
                 },
             },
             logScanRpcUrl: import.meta.env.VITE_CITREA_LOG_SCAN_ENDPOINT,
+            contracts: {
+                deployHeight: 18285383,
+                swapCodeHashes: [
+                    "0x03d96e1c37fe6055378dd426b7f71cdfe0df98a19d76f2413822ca27708571ab",
+                    "0xbb3dd1fc3df376db40bf17dafbe3d9a596bbfeee0fa35a8b2cee4a0be342d042",
+                ],
+            },
         },
     },
 } as Config;
