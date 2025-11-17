@@ -14,10 +14,10 @@ import type { BaseContract } from "ethers";
 import { ethers } from "ethers";
 import log from "loglevel";
 
-import { LBTC, RBTC } from "../consts/Assets";
+import { config } from "../config";
+import { isEvmAsset, LBTC } from "../consts/Assets";
 import { Denomination, Side, SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
-import { etherSwapCodeHashes } from "../context/Web3";
 import type { ChainSwapDetails } from "./boltzClient";
 import { decodeAddress } from "./compat";
 import { formatAmountDenomination } from "./denomination";
@@ -39,15 +39,15 @@ const invalidSendAmountMsg = (expected: number, got: number) =>
 const invalidReceiveAmountMsg = (expected: number, got: number) =>
     `invalid receive amount. Expected ${expected} to be bigger than ${got}`;
 
-type ContractGetter = () => BaseContract;
+type ContractGetter = (asset: string) => BaseContract;
 
-const validateContract = async (getEtherSwap: ContractGetter) => {
-    const codeHashes = etherSwapCodeHashes();
+const validateContract = async (getEtherSwap: ContractGetter, asset: string) => {
+    const codeHashes = config.assets[asset]?.contracts?.swapCodeHashes;
     if (codeHashes === undefined) {
         return true;
     }
 
-    const code = await getEtherSwap().getDeployedCode();
+    const code = await getEtherSwap(asset).getDeployedCode();
     if (!codeHashes.includes(ethers.keccak256(code))) {
         log.error("invalid contract code:", code);
         return false;
@@ -170,8 +170,8 @@ const validateReverse = async (
         return false;
     }
 
-    if (swap.assetReceive === RBTC) {
-        return validateContract(getEtherSwap);
+    if (isEvmAsset(swap.assetReceive)) {
+        return validateContract(getEtherSwap, swap.assetReceive);
     }
 
     // SwapTree
@@ -216,8 +216,8 @@ const validateSubmarine = async (
         return false;
     }
 
-    if (swap.assetSend === RBTC) {
-        return validateContract(getEtherSwap);
+    if (isEvmAsset(swap.assetSend)) {
+        return validateContract(getEtherSwap, swap.assetSend);
     }
 
     // SwapTree
@@ -291,8 +291,8 @@ const validateChainSwap = async (
             }
         }
 
-        if (asset === RBTC) {
-            return validateContract(getEtherSwap);
+        if (isEvmAsset(asset)) {
+            return validateContract(getEtherSwap, asset);
         }
 
         const ourKeys = deriveKey(

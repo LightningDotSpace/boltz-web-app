@@ -5,7 +5,6 @@ import log from "loglevel";
 
 import { config } from "../config";
 import type { AssetType } from "../consts/Assets";
-import { RBTC } from "../consts/Assets";
 import { EtherSwapAbi } from "../context/Web3";
 import { weiToSatoshi } from "./rootstock";
 
@@ -27,6 +26,7 @@ export const getLogsFromReceipt = async (
     signer: Signer,
     etherSwap: EtherSwap,
     txHash: string,
+    asset: string,
 ): Promise<LogRefundData> => {
     const receipt = await signer.provider.getTransactionReceipt(txHash);
 
@@ -37,7 +37,7 @@ export const getLogsFromReceipt = async (
             continue;
         }
 
-        return parseLockupEvent(etherSwap, event).data;
+        return parseLockupEvent(etherSwap, event, asset).data;
     }
 
     throw "could not find event";
@@ -47,20 +47,21 @@ async function* scanLogsForPossibleRefunds(
     abortSignal: AbortSignal,
     signer: Signer,
     etherSwap: EtherSwap,
+    asset: string,
 ) {
     const [signerAddress, latestBlock] = await Promise.all([
         signer.getAddress(),
         signer.provider.getBlockNumber(),
     ]);
 
-    const deployHeight = config.assets[RBTC].contracts.deployHeight;
+    const deployHeight = config.assets[asset].contracts.deployHeight;
     const filter = etherSwap.filters.Lockup(null, null, null, signerAddress);
 
     log.info(
         `Scanning for possible refunds of ${signerAddress} from ${deployHeight} to ${latestBlock}`,
     );
 
-    const scanProviderUrl = import.meta.env.VITE_RSK_LOG_SCAN_ENDPOINT;
+    const scanProviderUrl = config.assets[asset].logScanRpcUrl;
     if (scanProviderUrl === undefined) {
         return;
     }
@@ -97,7 +98,7 @@ async function* scanLogsForPossibleRefunds(
         for (const event of events) {
             log.debug(`Found lockup event in: ${event.transactionHash}`);
 
-            const { data, decoded } = parseLockupEvent(etherSwap, event);
+            const { data, decoded } = parseLockupEvent(etherSwap, event, asset);
             const stillLocked = await etherSwap.swaps(
                 solidityPackedKeccak256(
                     ["bytes32", "uint256", "address", "address", "uint256"],
@@ -138,6 +139,7 @@ const parseLockupEvent = (
         transactionHash: string;
         topics: readonly string[];
     },
+    asset: string,
 ): {
     data: LogRefundData;
     decoded: Result;
@@ -150,7 +152,7 @@ const parseLockupEvent = (
     return {
         decoded,
         data: {
-            asset: RBTC,
+            asset: asset as AssetType,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
             preimageHash: decoded[0].substring(2),

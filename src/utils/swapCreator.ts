@@ -3,7 +3,7 @@ import { crypto } from "bitcoinjs-lib";
 import { OutputType } from "boltz-core";
 import { randomBytes } from "crypto";
 
-import { RBTC } from "../consts/Assets";
+import { isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import type { newKeyFn } from "../context/Global";
 import type {
@@ -88,7 +88,7 @@ export const getRelevantAssetForSwap = (swap: SwapBase) => {
     }
 };
 
-export const isRsk = (swap: SomeSwap) => getRelevantAssetForSwap(swap) === RBTC;
+export const isRsk = (swap: SomeSwap) => isEvmAsset(getRelevantAssetForSwap(swap));
 
 const generatePreimage = ({
     isRsk,
@@ -116,7 +116,7 @@ export const createSubmarine = async (
     useRif: boolean,
     newKey: newKeyFn,
 ): Promise<SubmarineSwap> => {
-    const isRsk = assetReceive === RBTC;
+    const isRsk = isEvmAsset(assetReceive);
     const key = !isRsk ? newKey() : undefined;
     const res = await createSubmarineSwap(
         assetSend,
@@ -156,7 +156,7 @@ export const createReverse = async (
     rescueFile: RescueFile,
     newKey: newKeyFn,
 ): Promise<ReverseSwap> => {
-    const isRsk = assetReceive === RBTC;
+    const isRsk = isEvmAsset(assetReceive);
 
     const key = !isRsk ? newKey() : undefined;
     const preimage = generatePreimage({
@@ -206,9 +206,9 @@ export const createChain = async (
     rescueFile: RescueFile,
     newKey: newKeyFn,
 ): Promise<ChainSwap> => {
-    const claimKey = assetReceive !== RBTC ? newKey() : undefined;
-    const refundKey = assetSend !== RBTC ? newKey() : undefined;
-    const isRsk = assetReceive === RBTC || assetSend === RBTC;
+    const claimKey = !isEvmAsset(assetReceive) ? newKey() : undefined;
+    const refundKey = !isEvmAsset(assetSend) ? newKey() : undefined;
+    const isRsk = isEvmAsset(assetReceive) || isEvmAsset(assetSend);
     const preimage = generatePreimage({
         isRsk,
         keyIndex: claimKey?.index,

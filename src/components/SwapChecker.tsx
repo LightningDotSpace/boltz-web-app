@@ -3,7 +3,7 @@ import log from "loglevel";
 import { createEffect, onCleanup, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { BTC, LBTC, RBTC } from "../consts/Assets";
+import { BTC, LBTC, isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import {
     swapStatusFinal,
@@ -247,7 +247,7 @@ export const SwapChecker = () => {
             return;
         }
 
-        if (getRelevantAssetForSwap(currentSwap) === RBTC) {
+        if (isEvmAsset(getRelevantAssetForSwap(currentSwap))) {
             if (
                 data.status === swapStatusPending.TransactionMempool &&
                 data.transaction !== undefined

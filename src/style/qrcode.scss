@@ -25,6 +25,9 @@ $size: 40px;
     &[data-asset="RBTC"] span {
         background-image: vars.$rootstock_icon;
     }
+    &[data-asset="cBTC"] span {
+        background-image: vars.$citrea_icon;
+    }
     img {
         width: 300px;
         height: 300px;

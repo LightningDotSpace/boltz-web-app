@@ -18,7 +18,7 @@ import WeblnButton from "../components/WeblnButton";
 import SettingsCog from "../components/settings/SettingsCog";
 import SettingsMenu from "../components/settings/SettingsMenu";
 import { config } from "../config";
-import { RBTC } from "../consts/Assets";
+import { isEvmAsset } from "../consts/Assets";
 import { Denomination, Side, SwapType } from "../consts/Enums";
 import { useCreateContext } from "../context/Create";
 import { useGlobalContext } from "../context/Global";
@@ -224,7 +224,7 @@ const Create = () => {
         const amount = Number(sendAmount());
         if (
             swapType() === SwapType.Chain &&
-            assetSend() !== RBTC &&
+            !isEvmAsset(assetSend()) &&
             amount === 0
         ) {
             setAmountValid(true);
@@ -491,7 +491,7 @@ const Create = () => {
                     <Show
                         when={
                             swapType() !== SwapType.Submarine &&
-                            assetReceive() !== RBTC
+                            !isEvmAsset(assetReceive())
                         }>
                         <AddressInput />
                     </Show>
@@ -502,10 +502,10 @@ const Create = () => {
                         </Show>
                         <InvoiceInput />
                     </Show>
-                    <Show when={isMobile() && assetReceive() !== RBTC}>
+                    <Show when={isMobile() && !isEvmAsset(assetReceive())}>
                         <QrScan />
                     </Show>
-                    <Show when={[assetSend(), assetReceive()].includes(RBTC)}>
+                    <Show when={isEvmAsset(assetSend()) || isEvmAsset(assetReceive())}>
                         <ConnectWallet disabled={() => !pairValid()} />
                         <hr class="spacer" />
                     </Show>

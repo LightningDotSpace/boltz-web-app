@@ -46,6 +46,8 @@ import type { ChainSwap, SomeSwap, SubmarineSwap } from "../utils/swapCreator";
 import ErrorWasm from "./ErrorWasm";
 import { mapSwap } from "./RefundRescue";
 import { rescueListAction } from "./Rescue";
+import { config } from "../config";
+import { evmAssets } from "src/consts/Assets";
 
 export enum RefundError {
     InvalidData,
@@ -373,7 +375,7 @@ export const RefundBtcLike = () => {
     );
 };
 
-export const RefundRsk = () => {
+export const RefundEvm = (props: { asset: string }) => {
     const { t } = useGlobalContext();
     const { signer, getEtherSwap } = useWeb3Signer();
 
@@ -415,7 +417,8 @@ export const RefundRsk = () => {
         const generator = scanLogsForPossibleRefunds(
             refundScanAbort.signal,
             signer(),
-            getEtherSwap(),
+            getEtherSwap(props.asset),
+            props.asset,
         );
 
         for await (const value of generator) {
@@ -455,15 +458,23 @@ const RescueExternal = () => {
     const params = useParams();
     const navigate = useNavigate();
 
-    const tabBtc = { name: "Bitcoin / Liquid", value: "btc" };
-    const tabRsk = { name: "Rootstock", value: "rsk" };
+    const tabBtc = { name: "Bitcoin / Liquid", value: "btc", asset: null };
+    const tabsEvm = evmAssets
+        .filter(asset => config.assets[asset] !== undefined)
+        .map(asset => ({
+            name: asset,
+            value: asset.toLowerCase(),
+            asset: asset,
+        }));
+
+    const allTabs = [tabBtc, ...tabsEvm];
 
     const selected = () => params.type ?? tabBtc.value;
 
-    const rskAvailable =
-        import.meta.env.VITE_RSK_LOG_SCAN_ENDPOINT !== undefined;
-    if (!rskAvailable) {
-        log.warn("RSK log scan endpoint not available");
+    const evmAvailable = tabsEvm.length > 0 &&
+        tabsEvm.some(tab => config.assets[tab.asset]?.logScanRpcUrl !== undefined);
+    if (!evmAvailable && tabsEvm.length > 0) {
+        log.warn("EVM log scan endpoint not available for any EVM asset");
     }
 
     return (
@@ -474,9 +485,9 @@ const RescueExternal = () => {
                         <SettingsCog />
                         <h2>{t("rescue_external_swap")}</h2>
                     </header>
-                    <Show when={rskAvailable}>
+                    <Show when={evmAvailable}>
                         <div class="tabs">
-                            <For each={[tabBtc, tabRsk]}>
+                            <For each={allTabs}>
                                 {(tab) => (
                                     <div
                                         class={`tab ${selected() === tab.value ? "active" : ""}`}
@@ -494,9 +505,13 @@ const RescueExternal = () => {
                     <Show when={selected() === tabBtc.value}>
                         <RefundBtcLike />
                     </Show>
-                    <Show when={selected() === tabRsk.value}>
-                        <RefundRsk />
-                    </Show>
+                    <For each={tabsEvm}>
+                        {(tab) => (
+                            <Show when={selected() === tab.value}>
+                                <RefundEvm asset={tab.asset} />
+                            </Show>
+                        )}
+                    </For>
                     <SettingsMenu />
                 </div>
             </div>

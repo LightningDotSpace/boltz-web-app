@@ -7,7 +7,7 @@ import type { Accessor, Setter } from "solid-js";
 import { Show, createMemo, createResource, createSignal } from "solid-js";
 
 import RefundEta from "../components/RefundEta";
-import { RBTC } from "../consts/Assets";
+import { isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
 import { useGlobalContext } from "../context/Global";
@@ -33,6 +33,7 @@ export const RefundEvm = (props: {
     derivationPath?: string;
     timeoutBlockHeight: number;
     setRefundTxHash?: Setter<string>;
+    asset: string;
 }) => {
     const { setSwap } = usePayContext();
     const { getEtherSwap, signer } = useWeb3Signer();
@@ -41,9 +42,10 @@ export const RefundEvm = (props: {
     return (
         <ContractTransaction
             disabled={props.disabled}
+            asset={props.asset}
             /* eslint-disable-next-line solid/reactivity */
             onClick={async () => {
-                const contract = getEtherSwap();
+                const contract = getEtherSwap(props.asset);
 
                 let tx: TransactionResponse;
 
@@ -299,7 +301,7 @@ const RefundButton = (props: {
             when={
                 props.swap() === null ||
                 props.swap() === undefined ||
-                props.swap().assetSend !== RBTC
+                !isEvmAsset(props.swap().assetSend)
             }
             fallback={
                 <Show
@@ -328,6 +330,7 @@ const RefundButton = (props: {
                                     ),
                                 )
                                 .toString("hex")}
+                            asset={props.swap().assetSend}
                         />
                     }>
                     <Show
@@ -346,6 +349,7 @@ const RefundButton = (props: {
                                     .timeoutBlockHeight
                             }
                             preimageHash={preimageHash()}
+                            asset={props.swap().assetSend}
                         />
                     </Show>
                 </Show>
