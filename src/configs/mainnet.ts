@@ -105,7 +105,7 @@ const config = {
             contracts: {
                 deployHeight: 18285383,
                 swapCodeHashes: [
-                    "0x03d96e1c37fe6055378dd426b7f71cdfe0df98a19d76f2413822ca27708571ab",
+                    "0x8b214d409c7e43de9b31be1afed654ef4aa77c662fe4de91cb447d1589643fb1",
                     "0xbb3dd1fc3df376db40bf17dafbe3d9a596bbfeee0fa35a8b2cee4a0be342d042",
                 ],
             },
