@@ -219,6 +219,8 @@ const dict = {
         insufficient_balance_line:
             "You do not have enough balance in your wallet for this swap.",
         insufficient_gas: "Insufficient balance for gas fees",
+        server_claiming_cbtc: "Your cBTC is being claimed automatically",
+        no_action_needed: "No action needed from your side. The server will claim the swap automatically after the Lightning payment is complete.",
         select_wallet: "Select wallet",
         select_derivation_path: "Select derivation path",
         submit_derivation_path: "Submit",
@@ -684,6 +686,8 @@ const dict = {
         insufficient_balance_line:
             "Du hast nicht genügend Guthaben für diesen Swap.",
         insufficient_gas: "Unzureichendes Guthaben für Gasgebühren",
+        server_claiming_cbtc: "Deine cBTC werden automatisch geclaimt",
+        no_action_needed: "Keine Aktion nötig. Der Server claimed den Swap automatisch nach Abschluss der Lightning-Zahlung.",
         select_wallet: "Wallet auswählen",
         select_derivation_path: "Ableitungspfad auswählen",
         submit_derivation_path: "Senden",
@@ -1157,6 +1161,8 @@ const dict = {
         insufficient_balance_line:
             "No tienes saldo suficiente en tu monedero para este swap.",
         insufficient_gas: "Saldo insuficiente para tarifas de gas",
+        server_claiming_cbtc: "Tu cBTC está siendo reclamado automáticamente",
+        no_action_needed: "No se necesita ninguna acción de tu parte. El servidor reclamará el intercambio automáticamente después de que se complete el pago Lightning.",
         select_wallet: "Seleccionar monedero",
         select_derivation_path: "Seleccionar ruta de derivación",
         submit_derivation_path: "Enviar",
