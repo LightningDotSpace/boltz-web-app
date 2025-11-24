@@ -63,6 +63,17 @@ export const getClaimAddress = async (
     onchainAddress: Accessor<string>,
 ): Promise<{ useRif: boolean; gasPrice: bigint; claimAddress: string }> => {
     if (isEvmAsset(assetReceive())) {
+        // cBTC: Server claims automatically, no gas check needed
+        if (assetReceive() === 'cBTC') {
+            log.info("cBTC: Server will auto-claim");
+            return {
+                gasPrice: 0n,
+                useRif: false,
+                claimAddress: onchainAddress(),
+            };
+        }
+
+        // RBTC: Check balance for RIF or manual claim
         const [balance, gasPrice] = await Promise.all([
             signer().provider.getBalance(await signer().getAddress()),
             signer()

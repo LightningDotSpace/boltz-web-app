@@ -82,6 +82,9 @@ const TransactionConfirmed = () => {
     const chain = swap() as ChainSwap;
     const reverse = swap() as ReverseSwap;
 
+    // Check if cBTC (server claims automatically)
+    const isCBTC = () => swap().assetReceive === 'cBTC';
+
     return (
         <Show
             when={isEvmAsset(swap().assetReceive)}
@@ -92,34 +95,47 @@ const TransactionConfirmed = () => {
                     <LoadingSpinner />
                 </div>
             }>
-            <Show
-                when={swap().type !== SwapType.Chain}
-                fallback={
+            {/* cBTC: Show info message only, server claims automatically */}
+            <Show when={isCBTC()}>
+                <div>
+                    <h2>{t("tx_confirmed")}</h2>
+                    <p>{t("server_claiming_cbtc")}</p>
+                    <p class="info-text">{t("no_action_needed")}</p>
+                    <LoadingSpinner />
+                </div>
+            </Show>
+
+            {/* RBTC: Show manual claim UI */}
+            <Show when={!isCBTC()}>
+                <Show
+                    when={swap().type !== SwapType.Chain}
+                    fallback={
+                        <ClaimEvm
+                            swapId={chain.id}
+                            useRif={chain.useRif}
+                            preimage={chain.preimage}
+                            signerAddress={chain.signer}
+                            amount={chain.claimDetails.amount}
+                            derivationPath={chain.derivationPath}
+                            refundAddress={chain.claimDetails.refundAddress}
+                            timeoutBlockHeight={
+                                chain.claimDetails.timeoutBlockHeight
+                            }
+                            assetReceive={chain.assetReceive}
+                        />
+                    }>
                     <ClaimEvm
-                        swapId={chain.id}
-                        useRif={chain.useRif}
-                        preimage={chain.preimage}
-                        signerAddress={chain.signer}
-                        amount={chain.claimDetails.amount}
-                        derivationPath={chain.derivationPath}
-                        refundAddress={chain.claimDetails.refundAddress}
-                        timeoutBlockHeight={
-                            chain.claimDetails.timeoutBlockHeight
-                        }
-                        assetReceive={chain.assetReceive}
+                        swapId={reverse.id}
+                        useRif={reverse.useRif}
+                        preimage={reverse.preimage}
+                        amount={reverse.onchainAmount}
+                        signerAddress={reverse.signer}
+                        refundAddress={reverse.refundAddress}
+                        derivationPath={reverse.derivationPath}
+                        timeoutBlockHeight={reverse.timeoutBlockHeight}
+                        assetReceive={reverse.assetReceive}
                     />
-                }>
-                <ClaimEvm
-                    swapId={reverse.id}
-                    useRif={reverse.useRif}
-                    preimage={reverse.preimage}
-                    amount={reverse.onchainAmount}
-                    signerAddress={reverse.signer}
-                    refundAddress={reverse.refundAddress}
-                    derivationPath={reverse.derivationPath}
-                    timeoutBlockHeight={reverse.timeoutBlockHeight}
-                    assetReceive={reverse.assetReceive}
-                />
+                </Show>
             </Show>
         </Show>
     );
