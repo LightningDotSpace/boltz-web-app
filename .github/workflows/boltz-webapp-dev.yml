@@ -1,4 +1,4 @@
-name: Boltz Web App DEV CI/CD
+name: LDS Boltz Web App DEV CI/CD
 
 on:
   push:
@@ -10,12 +10,13 @@ env:
   NODE_ENVIRONMENT: dev
   NETWORK: mainnet
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-push:
-    name: Build & push (linux/arm64)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+  build-and-deploy:
+    name: Build and deploy to DEV
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,11 +27,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set up QEMU (arm64)
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -38,10 +34,25 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/arm64
           push: true
           tags: ${{ env.DOCKER_TAGS }}
-          provenance: false
+          platforms: linux/arm64
           build-args: |
             NODE_ENVIRONMENT=${{ env.NODE_ENVIRONMENT }}
             NETWORK=${{ env.NETWORK }}
+
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/download/2025.4.0/cloudflared-linux-arm64 -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
+      - name: Deploy
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_DEV_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.DEPLOY_DEV_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key \
+            -o ProxyCommand="cloudflared access ssh --hostname ${{ secrets.DEPLOY_DEV_HOST }}" \
+            ${{ secrets.DEPLOY_DEV_USER }}@${{ secrets.DEPLOY_DEV_HOST }} \
+            "lds-boltz-webapp"
