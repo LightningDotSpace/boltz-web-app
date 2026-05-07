@@ -38,6 +38,10 @@ export default [
         rules: {
             "no-async-promise-executor": "off",
             "no-console": 1,
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+            ],
             "no-restricted-imports": [
                 "error",
                 {
