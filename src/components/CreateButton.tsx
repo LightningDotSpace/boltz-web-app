@@ -64,7 +64,7 @@ export const getClaimAddress = async (
 ): Promise<{ useRif: boolean; gasPrice: bigint; claimAddress: string }> => {
     if (isEvmAsset(assetReceive())) {
         // cBTC: Server claims automatically, no gas check needed
-        if (assetReceive() === 'cBTC') {
+        if (assetReceive() === "cBTC") {
             log.info("cBTC: Server will auto-claim");
             return {
                 gasPrice: 0n,
@@ -87,12 +87,16 @@ export const getClaimAddress = async (
 
         if (balance <= balanceNeeded) {
             const assetConfig = config.assets[assetReceive()];
-            if (assetConfig?.rifRelay && assetConfig?.contracts?.smartWalletFactory) {
+            if (
+                assetConfig?.rifRelay &&
+                assetConfig?.contracts?.smartWalletFactory
+            ) {
                 log.info("Using RIF smart wallet as claim address");
                 return {
                     gasPrice,
                     useRif: true,
-                    claimAddress: (await getSmartWalletAddress(signer())).address,
+                    claimAddress: (await getSmartWalletAddress(signer()))
+                        .address,
                 };
             } else {
                 throw new Error("insufficient_gas");

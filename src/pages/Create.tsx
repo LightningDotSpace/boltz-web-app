@@ -505,7 +505,11 @@ const Create = () => {
                     <Show when={isMobile() && !isEvmAsset(assetReceive())}>
                         <QrScan />
                     </Show>
-                    <Show when={isEvmAsset(assetSend()) || isEvmAsset(assetReceive())}>
+                    <Show
+                        when={
+                            isEvmAsset(assetSend()) ||
+                            isEvmAsset(assetReceive())
+                        }>
                         <ConnectWallet disabled={() => !pairValid()} />
                         <hr class="spacer" />
                     </Show>

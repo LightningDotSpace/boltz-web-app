@@ -13,6 +13,7 @@ import {
     createSignal,
     onCleanup,
 } from "solid-js";
+import { evmAssets } from "src/consts/Assets";
 
 import BlockExplorer from "../components/BlockExplorer";
 import ConnectWallet from "../components/ConnectWallet";
@@ -24,6 +25,7 @@ import SwapList, { sortSwaps } from "../components/SwapList";
 import SwapListLogs from "../components/SwapListLogs";
 import SettingsCog from "../components/settings/SettingsCog";
 import SettingsMenu from "../components/settings/SettingsMenu";
+import { config } from "../config";
 import { useGlobalContext } from "../context/Global";
 import { usePayContext } from "../context/Pay";
 import { useRescueContext } from "../context/Rescue";
@@ -46,8 +48,6 @@ import type { ChainSwap, SomeSwap, SubmarineSwap } from "../utils/swapCreator";
 import ErrorWasm from "./ErrorWasm";
 import { mapSwap } from "./RefundRescue";
 import { rescueListAction } from "./Rescue";
-import { config } from "../config";
-import { evmAssets } from "src/consts/Assets";
 
 export enum RefundError {
     InvalidData,
@@ -460,8 +460,8 @@ const RescueExternal = () => {
 
     const tabBtc = { name: "Bitcoin / Liquid", value: "btc", asset: null };
     const tabsEvm = evmAssets
-        .filter(asset => config.assets[asset] !== undefined)
-        .map(asset => ({
+        .filter((asset) => config.assets[asset] !== undefined)
+        .map((asset) => ({
             name: asset,
             value: asset.toLowerCase(),
             asset: asset,
@@ -471,8 +471,11 @@ const RescueExternal = () => {
 
     const selected = () => params.type ?? tabBtc.value;
 
-    const evmAvailable = tabsEvm.length > 0 &&
-        tabsEvm.some(tab => config.assets[tab.asset]?.logScanRpcUrl !== undefined);
+    const evmAvailable =
+        tabsEvm.length > 0 &&
+        tabsEvm.some(
+            (tab) => config.assets[tab.asset]?.logScanRpcUrl !== undefined,
+        );
     if (!evmAvailable && tabsEvm.length > 0) {
         log.warn("EVM log scan endpoint not available for any EVM asset");
     }

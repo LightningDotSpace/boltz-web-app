@@ -15,7 +15,7 @@ import { ethers } from "ethers";
 import log from "loglevel";
 
 import { config } from "../config";
-import { isEvmAsset, LBTC } from "../consts/Assets";
+import { LBTC, isEvmAsset } from "../consts/Assets";
 import { Denomination, Side, SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
 import type { ChainSwapDetails } from "./boltzClient";
@@ -41,7 +41,10 @@ const invalidReceiveAmountMsg = (expected: number, got: number) =>
 
 type ContractGetter = (asset: string) => BaseContract;
 
-const validateContract = async (getEtherSwap: ContractGetter, asset: string) => {
+const validateContract = async (
+    getEtherSwap: ContractGetter,
+    asset: string,
+) => {
     const codeHashes = config.assets[asset]?.contracts?.swapCodeHashes;
     if (codeHashes === undefined) {
         return true;

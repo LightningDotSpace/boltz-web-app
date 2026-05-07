@@ -5,7 +5,7 @@ import type { LiquidClaimDetails } from "boltz-core/dist/lib/liquid";
 import type { Network as LiquidNetwork } from "liquidjs-lib/src/networks";
 import log from "loglevel";
 
-import { isEvmAsset, LBTC } from "../consts/Assets";
+import { LBTC, isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import type { deriveKeyFn } from "../context/Global";
 import type { RescueFile } from "../utils/rescueFile";

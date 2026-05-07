@@ -93,7 +93,9 @@ const Web3SignerProvider = (props: {
 }) => {
     const { setRdns, getRdnsForAddress, t } = useGlobalContext();
 
-    const hasEvmAssets = evmAssets.some(asset => config.assets[asset] !== undefined);
+    const hasEvmAssets = evmAssets.some(
+        (asset) => config.assets[asset] !== undefined,
+    );
 
     const [providers, setProviders] = createSignal<
         Record<string, EIP6963ProviderDetail>
