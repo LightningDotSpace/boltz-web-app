@@ -82,7 +82,12 @@ const RefundEvm = () => {
         }
 
         const [logData, currentHeight] = await Promise.all([
-            getLogsFromReceipt(signer(), getEtherSwap(params.asset), params.txHash, params.asset),
+            getLogsFromReceipt(
+                signer(),
+                getEtherSwap(params.asset),
+                params.txHash,
+                params.asset,
+            ),
             signer().provider.getBlockNumber(),
         ]);
 

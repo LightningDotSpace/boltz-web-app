@@ -88,7 +88,8 @@ export const getRelevantAssetForSwap = (swap: SwapBase) => {
     }
 };
 
-export const isRsk = (swap: SomeSwap) => isEvmAsset(getRelevantAssetForSwap(swap));
+export const isRsk = (swap: SomeSwap) =>
+    isEvmAsset(getRelevantAssetForSwap(swap));
 
 const generatePreimage = ({
     isRsk,

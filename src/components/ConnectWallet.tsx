@@ -331,7 +331,9 @@ const ConnectWallet = (props: {
                         derivationPath={props.derivationPath}
                     />
                 }>
-                <Show when={networkValid()} fallback={<SwitchNetwork asset={assetReceive()} />}>
+                <Show
+                    when={networkValid()}
+                    fallback={<SwitchNetwork asset={assetReceive()} />}>
                     <ShowAddress
                         address={address}
                         addressOverride={props.addressOverride}

@@ -12,7 +12,15 @@ import {
 import type { Accessor, JSX, Setter } from "solid-js";
 
 import { config } from "../config";
-import { type AssetType, type EvmAssetType, BTC, LBTC, LN, RBTC, assets } from "../consts/Assets";
+import {
+    type AssetType,
+    BTC,
+    type EvmAssetType,
+    LBTC,
+    LN,
+    RBTC,
+    assets,
+} from "../consts/Assets";
 import { Side, SwapType, UrlParam } from "../consts/Enums";
 import type { DictKey } from "../i18n/i18n";
 import { getAddress, getNetwork } from "../utils/compat";

@@ -2,7 +2,7 @@ import { Buffer } from "buffer";
 import type { ECPairInterface } from "ecpair";
 
 import { chooseUrl, config } from "../config";
-import { BTC, isEvmAsset, LN } from "../consts/Assets";
+import { BTC, LN, isEvmAsset } from "../consts/Assets";
 import { SwapType } from "../consts/Enums";
 import { referralIdKey } from "../consts/LocalStorage";
 import type { deriveKeyFn } from "../context/Global";

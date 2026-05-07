@@ -83,7 +83,7 @@ const TransactionConfirmed = () => {
     const reverse = swap() as ReverseSwap;
 
     // Check if cBTC (server claims automatically)
-    const isCBTC = () => swap().assetReceive === 'cBTC';
+    const isCBTC = () => swap().assetReceive === "cBTC";
 
     return (
         <Show

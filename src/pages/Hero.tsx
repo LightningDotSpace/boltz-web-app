@@ -4,10 +4,10 @@ import log from "loglevel";
 import { Show, createSignal, onMount } from "solid-js";
 
 import bitcoin from "../assets/bitcoin-icon.svg";
+import cbtc from "../assets/citrea-icon.svg";
 import lightning from "../assets/lightning-icon.svg";
 import liquid from "../assets/liquid-icon.svg";
 import rbtc from "../assets/rootstock-icon.svg";
-import cbtc from "../assets/citrea-icon.svg";
 import { config } from "../config";
 import { BTC } from "../consts/Assets";
 import { Denomination } from "../consts/Enums";
