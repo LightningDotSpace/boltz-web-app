@@ -1633,6 +1633,9 @@ const dict = {
         insufficient_balance_line:
             "Não há saldo suficiente na sua carteira para essa troca.",
         insufficient_gas: "Saldo insuficiente para taxas de gás",
+        server_claiming_cbtc: "Seu cBTC está sendo reclamado automaticamente",
+        no_action_needed:
+            "Nenhuma ação necessária do seu lado. O servidor reclamará o swap automaticamente após a conclusão do pagamento Lightning.",
         select_wallet: "Selecionar carteira",
         select_derivation_path: "Selecionar caminho de derivação",
         submit_derivation_path: "Enviar",
@@ -2072,6 +2075,9 @@ const dict = {
         insufficient_balance: "余额不足",
         insufficient_balance_line: "您的钱包余额不足以进行此次交换。",
         insufficient_gas: "gas费余额不足",
+        server_claiming_cbtc: "您的 cBTC 正在自动认领中",
+        no_action_needed:
+            "您无需采取任何操作。Lightning 付款完成后,服务器将自动认领此次交换。",
         select_wallet: "选择钱包",
         select_derivation_path: "选择派生路径",
         submit_derivation_path: "提交",
@@ -2517,6 +2523,9 @@ const dict = {
         insufficient_balance_line:
             "このスワップを実行するのに十分な残高がウォレットにありません",
         insufficient_gas: "ガス料金の残高不足",
+        server_claiming_cbtc: "cBTC は自動的にクレームされています",
+        no_action_needed:
+            "ユーザー側での操作は不要です。Lightning 決済完了後、サーバーが自動的にスワップをクレームします。",
         select_wallet: "ウォレットの選択",
         select_derivation_path: "導出パスの選択",
         submit_derivation_path: "提出",
