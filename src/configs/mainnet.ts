@@ -89,12 +89,12 @@ const config = {
         cBTC: {
             blockExplorerUrl: {
                 id: Explorer.Blockscout,
-                normal: "https://testnet.citreascan.com",
+                normal: "https://citreascan.com",
             },
             network: {
-                chainName: "Citrea Testnet",
-                chainId: 5115,
-                rpcUrls: ["https://rpc.testnet.citreascan.com"],
+                chainName: "Citrea",
+                chainId: 4114,
+                rpcUrls: ["https://rpc.citreascan.com"],
                 nativeCurrency: {
                     name: "cBTC",
                     symbol: "cBTC",
@@ -103,10 +103,10 @@ const config = {
             },
             logScanRpcUrl: import.meta.env.VITE_CITREA_LOG_SCAN_ENDPOINT,
             contracts: {
-                deployHeight: 18285383,
+                deployHeight: 2684260,
                 swapCodeHashes: [
-                    "0x8b214d409c7e43de9b31be1afed654ef4aa77c662fe4de91cb447d1589643fb1",
-                    "0xbb3dd1fc3df376db40bf17dafbe3d9a596bbfeee0fa35a8b2cee4a0be342d042",
+                    "0xa91eef2a6341bc22f96ca4d80a3cc77b677ace8c8a145ca48da9935c6a8ec880",
+                    "0x0699ca597f1fecdd34ea38e5e0e1a959cb3c1247d2a7e2e646cb37802a28c78e",
                 ],
             },
         },
