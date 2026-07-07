@@ -47,6 +47,7 @@ test.describe("Chain swap", () => {
         const sendAmount = await expectApproxAmount(
             inputSendAmount,
             "0.01002791",
+            500,
         );
 
         const inputOnchainAddress = page.locator(

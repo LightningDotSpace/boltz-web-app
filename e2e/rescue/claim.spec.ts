@@ -41,7 +41,7 @@ const claimPendingSwap = async ({
     const swapItem = page.locator(`div[data-testid='swaplist-item-${swapId}']`);
 
     await expect(swapItem).toBeVisible();
-    await expect(swapItem).not.toBeDisabled();
+    await expect(swapItem).not.toHaveClass(/disabled/, { timeout: 15_000 });
 
     await swapItem.click();
 

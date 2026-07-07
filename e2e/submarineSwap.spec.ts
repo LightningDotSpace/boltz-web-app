@@ -39,6 +39,7 @@ test.describe("Submarine swap", () => {
         const sendAmount = await expectApproxAmount(
             inputSendAmount,
             "0.01001151",
+            500,
         );
 
         const invoiceInput = page.locator("textarea[data-testid='invoice']");

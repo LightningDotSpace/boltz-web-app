@@ -27,6 +27,7 @@ test.describe("reverseSwap", () => {
         const sendAmount = await expectApproxAmount(
             inputSendAmount,
             "0.01005080",
+            500,
         );
 
         const inputOnchainAddress = page.locator(

@@ -389,6 +389,10 @@ export const waitForBlockHeight = async (asset: string, height: number) => {
         .toBe(true);
 };
 
+// Miner-fee estimates vary across backend image versions; passing a wider
+// tolerance (e.g. 500 sats) absorbs that variance while still catching
+// percentage-fee regressions (>= 1000 sats at these amounts). The default
+// (amountBufferSats) stays tight for otherwise-exact assertions.
 export const expectApproxAmount = async (
     input: Locator,
     expectedBtc: string,

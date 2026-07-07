@@ -12,7 +12,7 @@ index 632e6fd..44458b0 100755
 -  swapMaximal = 2880
 -  swapTaproot = 10080
 +  chain = 180
-+  reverse = 180
++  reverse = 1440
 +  swapMinimal = 400
 +  swapMaximal = 450
 +  swapTaproot = 1200
@@ -29,7 +29,7 @@ index 632e6fd..44458b0 100755
 -  swapMaximal = 2880
 -  swapTaproot = 10080
 +  chain = 180
-+  reverse = 180
++  reverse = 1440
 +  swapMinimal = 400
 +  swapMaximal = 450
 +  swapTaproot = 1200

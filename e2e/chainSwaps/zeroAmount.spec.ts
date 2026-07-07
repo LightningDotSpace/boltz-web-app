@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 
 import {
-    amountBufferSats,
     bitcoinSendToAddress,
     expectApproxBtcAmount,
     generateBitcoinBlock,
@@ -57,7 +56,7 @@ test.describe("Chain Swap 0-amount", () => {
         expectApproxBtcAmount(
             txInfo.amount.bitcoin.toString(),
             "0.00997297",
-            amountBufferSats,
+            500,
         );
     });
 
