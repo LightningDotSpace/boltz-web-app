@@ -101,7 +101,8 @@ test.describe("Submarine swap", () => {
     test("BTC/LN with expensive MRH doesn't use MRH", async ({ page }) => {
         await page.goto("/?ref=expensive");
 
-        if (!(await getReferrals())["expensive"]) {
+        const referrals = await getReferrals();
+        if (!referrals.some((r) => r.id === "expensive")) {
             await addReferral("expensive");
         }
 
