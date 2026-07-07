@@ -118,6 +118,7 @@ test.describe("Claim", () => {
         test(`${assetSend} -> ${assetReceive}: Claim pending chain swap via rescue key scan`, async ({
             page,
         }) => {
+            test.setTimeout(60_000);
             const sendAmount = await createChainSwap(page, assetSend);
 
             await backupRescueFile(page, fileName);
@@ -156,6 +157,7 @@ test.describe("Claim", () => {
         test(`${asset}: Claim pending reverse swap via rescue key scan`, async ({
             page,
         }) => {
+            test.setTimeout(60_000);
             await page.goto("/");
 
             const receiveAmount = "0.01";

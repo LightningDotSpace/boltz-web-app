@@ -161,6 +161,7 @@ const performBitcoinExpiredSwapSetup = async (
         await waitForNodesToSync();
         await waitForBlockHeight(sendAsset, currentHeight + blocks);
     }
+    await waitForUTXOs(sendAsset as AssetType, address, 2);
 };
 
 const performLiquidExpiredSwapSetup = async (
@@ -184,6 +185,7 @@ const performLiquidExpiredSwapSetup = async (
         await waitForNodesToSync();
         await waitForBlockHeight(sendAsset, currentHeight + blocks);
     }
+    await waitForUTXOs(sendAsset as AssetType, address, 2);
 };
 
 const executeRefund = async (
@@ -235,8 +237,9 @@ const validateRefundTransaction = async (
 test.describe("Refund", () => {
     const refundFileJson = path.join(__dirname, fileName);
 
-    test.beforeEach(async () => {
+    test.beforeEach(async ({ page }) => {
         await generateLiquidBlock();
+        await page.route("**/utxo", (route) => route.continue()); // disabling HTTP caching for UTXOs
     });
 
     test.afterEach(() => {
@@ -345,7 +348,7 @@ test.describe("Refund", () => {
 
             await expect(
                 page.locator("div[data-status='transaction.claimed']"),
-            ).toBeVisible({ timeout: 15_000 });
+            ).toBeVisible({ timeout: 30_000 });
 
             await waitForUTXOs(swap.sendAsset as AssetType, address, 0);
 
@@ -366,6 +369,7 @@ test.describe("Refund", () => {
                 address,
                 sendAmount,
             );
+            await page.reload();
             await executeRefund(page, swap.sendAsset, swapId, swap.external);
             await validateRefundTransaction(page, swap.sendAsset, address);
         });

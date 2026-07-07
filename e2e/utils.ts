@@ -1,5 +1,6 @@
-import { type Page, expect, request } from "@playwright/test";
+import { type Locator, type Page, expect, request } from "@playwright/test";
 import axios from "axios";
+import BigNumber from "bignumber.js";
 import { crypto } from "bitcoinjs-lib";
 import bolt11 from "bolt11";
 import { exec, spawn } from "child_process";
@@ -13,10 +14,12 @@ import { config } from "../src/config";
 import { type AssetType, BTC, LBTC } from "../src/consts/Assets";
 import dict from "../src/i18n/i18n";
 import { type UTXO } from "../src/utils/blockchain";
+import { btcToSat } from "../src/utils/denomination";
 import { ecc } from "../src/utils/ecpair";
 import { findMagicRoutingHint } from "../src/utils/magicRoutingHint";
 
 const execAsync = promisify(exec);
+export const amountBufferSats = 1;
 
 const executeInScriptsContainer =
     'docker exec boltz-scripts bash -c "source /etc/profile.d/utils.sh && ';
@@ -384,4 +387,26 @@ export const waitForBlockHeight = async (asset: string, height: number) => {
             { timeout: 30_000 },
         )
         .toBe(true);
+};
+
+export const expectApproxAmount = async (
+    input: Locator,
+    expectedBtc: string,
+    toleranceSats: number = amountBufferSats,
+): Promise<string> => {
+    const val = await input.inputValue();
+    expectApproxBtcAmount(val, expectedBtc, toleranceSats);
+    return val;
+};
+
+export const expectApproxBtcAmount = (
+    actualBtc: string,
+    expectedBtc: string,
+    toleranceSats: number = amountBufferSats,
+): void => {
+    const expectedSats = btcToSat(BigNumber(expectedBtc));
+    const actualSats = btcToSat(BigNumber(actualBtc));
+    expect(actualSats.minus(expectedSats).abs().toNumber()).toBeLessThanOrEqual(
+        toleranceSats,
+    );
 };

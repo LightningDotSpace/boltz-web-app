@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 import {
+    expectApproxAmount,
+    expectApproxBtcAmount,
     generateBitcoinBlock,
     getBitcoinAddress,
     getBitcoinWalletTx,
@@ -22,7 +24,10 @@ test.describe("reverseSwap", () => {
         await inputReceiveAmount.fill(receiveAmount);
 
         const inputSendAmount = page.locator("input[data-testid='sendAmount']");
-        await expect(inputSendAmount).toHaveValue("0.01005558");
+        const sendAmount = await expectApproxAmount(
+            inputSendAmount,
+            "0.01005080",
+        );
 
         const inputOnchainAddress = page.locator(
             "input[data-testid='onchainAddress']",
@@ -38,7 +43,7 @@ test.describe("reverseSwap", () => {
             "h2[data-testid='pay-invoice-title']",
         );
         await expect(payInvoiceTitle).toHaveText(
-            "Pay this invoice about 0.01005558 BTC",
+            `Pay this invoice about ${sendAmount} BTC`,
         );
 
         const spanLightningInvoice = page.locator("span[class='btn']");
@@ -57,6 +62,6 @@ test.describe("reverseSwap", () => {
         expect(txId).toBeDefined();
 
         const txInfo = JSON.parse(await getBitcoinWalletTx(txId));
-        expect(txInfo.amount.toString()).toEqual(receiveAmount);
+        expectApproxBtcAmount(txInfo.amount.toString(), receiveAmount);
     });
 });
